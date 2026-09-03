@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>frontend</title>
+  </head>
+  <body>
+    <div id="error-overlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:#fee2e2; color:#991b1b; padding:2rem; font-family:monospace; z-index:99999; overflow:auto;">
+      <h2 style="font-size:1.5rem; font-weight:bold; margin-bottom:1rem;">Application Startup Error</h2>
+      <pre id="error-message" style="white-space:pre-wrap; word-break:break-word;"></pre>
+    </div>
+    <script>
+      window.addEventListener('error', function(e) {
+        var overlay = document.getElementById('error-overlay');
+        var msg = document.getElementById('error-message');
+        if (overlay && msg) {
+          overlay.style.display = 'block';
+          msg.textContent = (e.message || e.error) + '\n\n' + (e.error ? e.error.stack : '') + '\n\nSource: ' + e.filename + ':' + e.lineno;
+        }
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        var overlay = document.getElementById('error-overlay');
+        var msg = document.getElementById('error-message');
+        if (overlay && msg) {
+          overlay.style.display = 'block';
+          msg.textContent = 'Unhandled Promise Rejection: ' + (e.reason ? (e.reason.stack || e.reason.message || e.reason) : e);
+        }
+      });
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

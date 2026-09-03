@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./servicedesk/backend
+      dockerfile: Dockerfile
+    container_name: servicedesk-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGODB_URI=${MONGODB_URI:-mongodb+srv://muhammadmujtaba1617_db_user:rm9K6GVSHzG4dzdj@cluster0.aaiy9h9.mongodb.net/servicedesk?retryWrites=true&w=majority}
+      - JWT_SECRET=${JWT_SECRET:-servicedesk_production_jwt_super_secret_key_2026}
+      - CLIENT_URL=${CLIENT_URL:-http://localhost}
+    volumes:
+      - uploads_data:/app/uploads
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: servicedesk-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  uploads_data:
+    name: servicedesk_uploads
