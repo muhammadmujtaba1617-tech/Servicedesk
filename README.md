@@ -7,7 +7,15 @@
 
 ---
 
-## 📌 Executive Overview
+## 🌐 Live Production Deployment
+
+| Service | Live Public URL | Status |
+| :--- | :--- | :--- |
+| **Frontend Web App** | 🔗 [**https://servicedesk-f91a.vercel.app**](https://servicedesk-f91a.vercel.app) | **Live & Operational** |
+| **Backend REST API** | 🔗 [**https://servicedesk-backened.vercel.app**](https://servicedesk-backened.vercel.app/api/v1/health) | **Live & Connected to MongoDB Atlas** |
+| **GitHub Repository** | 🐙 [**https://github.com/muhammadmujtaba1617-tech/Servicedesk**](https://github.com/muhammadmujtaba1617-tech/Servicedesk) | **Public** |
+
+---
 
 ServiceDesk is a production-grade, multi-user service request and incident management platform engineered for modern software organizations. The system delivers a complete IT Service Management (ITSM) lifecycle featuring **role-based access control (RBAC)**, **controlled finite state machine workflows**, **dynamic SLA calculation and live countdown timers**, **confidential internal notes**, **real-time WebSocket event broadcasts**, **multipart file attachments**, **interactive analytics visualizations**, and **immutable audit logging**.
 
