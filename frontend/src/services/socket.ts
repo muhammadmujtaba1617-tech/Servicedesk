@@ -2,9 +2,15 @@ import { io, Socket } from 'socket.io-client';
 
 let socket: Socket | null = null;
 
+const SOCKET_URL =
+  import.meta.env.VITE_SOCKET_URL ||
+  (typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+    ? 'https://servicedesk-backened.vercel.app'
+    : 'http://localhost:3000');
+
 export const getSocket = (): Socket => {
   if (!socket) {
-    socket = io('http://localhost:3000', {
+    socket = io(SOCKET_URL, {
       autoConnect: true,
       transports: ['websocket', 'polling'],
     });
