@@ -1,0 +1,8 @@
+{
+  "name": "servicedesk-monorepo",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "start": "cd servicedesk/backend && node server.js"
+  }
+}
