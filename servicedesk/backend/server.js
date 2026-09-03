@@ -64,10 +64,15 @@ initSocket(server);
 
 const startServer = async () => {
   await dbConnection();
-  server.listen(PORT, () => {
-    console.log(`ServiceDesk API with WebSockets running on port ${PORT}`);
-  });
+  if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
+    server.listen(PORT, () => {
+      console.log(`ServiceDesk API with WebSockets running on port ${PORT}`);
+    });
+  }
 };
 
 startServer();
+
+module.exports = app;
+
 
