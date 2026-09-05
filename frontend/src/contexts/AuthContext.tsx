@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useState, type ReactNode } from 'react';
+import apiClient from '../services/apiClient';
 
 interface User {
   id: string;
+  _id?: string;
   email: string;
   name: string;
   role: 'customer' | 'agent' | 'admin';
@@ -35,46 +37,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      try {
-        const response = await fetch(`${apiUrl}/api/v1/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          const userData = data.data.user;
-          setUser(userData);
-          localStorage.setItem('user', JSON.stringify(userData));
-          localStorage.setItem('token', data.data.token);
-          return;
-        }
-      } catch (networkErr) {
-        console.warn('Backend server not reachable, checking demo credentials fallback...', networkErr);
+      const response = await apiClient.post('/api/v1/auth/login', { email, password });
+      if (response.data?.success && response.data?.data?.user) {
+        const userData = response.data.data.user;
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('token', response.data.data.token);
+        return;
       }
-
-      // Demo fallback if backend is not running yet
-      if (password === 'ServiceDesk2026!' || password === 'password') {
-        let demoUser: User | null = null;
-        if (email === 'admin@example.com') {
-          demoUser = { id: 'usr_admin', email, name: 'Admin User', role: 'admin' };
-        } else if (email === 'agent@example.com') {
-          demoUser = { id: 'usr_agent', email, name: 'Agent Smith', role: 'agent' };
-        } else if (email === 'customer@example.com') {
-          demoUser = { id: 'usr_cust', email, name: 'Customer Jane', role: 'customer' };
-        }
-
-        if (demoUser) {
-          setUser(demoUser);
-          localStorage.setItem('user', JSON.stringify(demoUser));
-          localStorage.setItem('token', 'demo-token-jwt');
-          return;
-        }
-      }
-
-      throw new Error('Invalid email or password');
+      throw new Error(response.data?.message || 'Login failed');
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message || 'Invalid email or password';
+      throw new Error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -83,36 +57,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const register = async (name: string, email: string, password: string, role: string) => {
     setIsLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      try {
-        const response = await fetch(`${apiUrl}/api/v1/auth/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password, role }),
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          const userData = data.data.user;
-          setUser(userData);
-          localStorage.setItem('user', JSON.stringify(userData));
-          localStorage.setItem('token', data.data.token);
-          return;
-        }
-      } catch (networkErr) {
-        console.warn('Backend server not reachable, creating local demo session...', networkErr);
+      const response = await apiClient.post('/api/v1/auth/register', { name, email, password, role });
+      if (response.data?.success && response.data?.data?.user) {
+        const userData = response.data.data.user;
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('token', response.data.data.token);
+        return;
       }
-
-      // Demo fallback for register
-      const demoUser: User = {
-        id: `usr_${Date.now()}`,
-        email,
-        name,
-        role: role as 'customer' | 'agent' | 'admin',
-      };
-      setUser(demoUser);
-      localStorage.setItem('user', JSON.stringify(demoUser));
-      localStorage.setItem('token', 'demo-token-jwt');
+      throw new Error(response.data?.message || 'Registration failed');
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message || 'Registration failed';
+      throw new Error(msg);
     } finally {
       setIsLoading(false);
     }

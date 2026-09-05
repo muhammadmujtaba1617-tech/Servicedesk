@@ -37,6 +37,16 @@ const path = require('path');
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+app.use(async (req, res, next) => {
+  try {
+    await dbConnection();
+    next();
+  } catch (err) {
+    console.error('Database connection error in request:', err.message);
+    res.status(500).json({ success: false, message: 'Database connection failed: ' + err.message });
+  }
+});
+
 app.get('/api/v1/health', (req, res) => {
   res.json({ success: true, message: 'ServiceDesk API is running' });
 });
