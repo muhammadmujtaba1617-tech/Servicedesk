@@ -66,23 +66,25 @@ app.use((err, req, res, next) => {
   res.status(500).json({ success: false, message: 'Something went wrong' });
 });
 
-const http = require('http');
-const { initSocket } = require('./src/config/socket');
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
+  const http = require('http');
+  const { initSocket } = require('./src/config/socket');
 
-const server = http.createServer(app);
-initSocket(server);
+  const server = http.createServer(app);
+  initSocket(server);
 
-const startServer = async () => {
-  await dbConnection();
-  if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
-    server.listen(PORT, () => {
-      console.log(`ServiceDesk API with WebSockets running on port ${PORT}`);
+  dbConnection()
+    .then(() => {
+      server.listen(PORT, () => {
+        console.log(`ServiceDesk API with WebSockets running on port ${PORT}`);
+      });
+    })
+    .catch((err) => {
+      console.error('Initial DB connection error on startup:', err.message);
     });
-  }
-};
-
-startServer();
+}
 
 module.exports = app;
+
 
 
